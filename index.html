@@ -345,3 +345,382 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>စာမေးပွဲရလဒ်ကြေငြာစာ - Madrasah Taleemul Quran</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f9ff; font-family: 'Segoe UI', system-ui; padding-bottom: 2rem; }
+        .result-card { max-width: 98%; margin: 1rem auto; overflow-x: auto; }
+        .card-header { background: #2c5f2d; color: white; font-weight: bold; }
+        .table th, .table td { vertical-align: middle; text-align: center; white-space: nowrap; }
+        .table input { width: 80px; text-align: center; margin: 0 auto; display: inline-block; }
+        .table input[type="text"] { width: 120px; }
+        .grade-A { background-color: #d4edda; }
+        .grade-B { background-color: #d1ecf1; }
+        .grade-C { background-color: #fff3cd; }
+        .grade-D { background-color: #f8d7da; }
+        footer { text-align: center; margin-top: 2rem; color: #6c757d; }
+        .btn-print, .btn-login { background: #2c5f2d; border: none; color: white; padding: 0.5rem 1.5rem; border-radius: 2rem; margin: 0.2rem; }
+        .btn-print:hover, .btn-login:hover { background: #1e4620; }
+        .btn-logout { background: #dc3545; }
+        .btn-logout:hover { background: #a71d2a; }
+        .class-selector { max-width: 300px; margin-bottom: 1rem; }
+        .admin-bar { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .login-modal input { margin-bottom: 0.5rem; }
+        .editable { background-color: #fff; }
+        .readonly { background-color: #e9ecef; }
+        .total-col { font-weight: bold; background-color: #f8f9fa; }
+        .grade-col { font-weight: bold; }
+        @media print {
+            .no-print { display: none; }
+            .table input { border: none; background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="result-card">
+            <div class="card shadow">
+                <div class="card-header text-center">
+                    📊 အတန်းအလိုက် စာမေးပွဲရလဒ်ကြေငြာစာ
+                </div>
+                <div class="card-body">
+                    <!-- Admin Bar -->
+                    <div class="admin-bar no-print" id="adminBar">
+                        <div class="class-selector">
+                            <label class="form-label fw-bold">အတန်းရွေးပါ</label>
+                            <select id="classSelect" class="form-select">
+                                <option value="">-- ကျေးဇူးပြု၍ ရွေးပါ --</option>
+                                <option value="1">မူကြိုတန်း</option>
+                                <option value="2">သူငယ်တန်းလေး</option>
+                                <option value="3">သူငယ်တန်းကြီး</option>
+                                <option value="4">ပထမတန်းလေး</option>
+                                <option value="5">ပထမတန်းကြီး</option>
+                                <option value="6">ဒုတိယတန်း</option>
+                                <option value="7">တတိယတန်း</option>
+                                <option value="8">စတုတ္ထတန်း</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span id="loginStatus" class="badge bg-secondary me-2">Admin မဝင်ရသေး</span>
+                            <button id="loginBtn" class="btn-login btn">🔐 Login</button>
+                            <button id="logoutBtn" class="btn-login btn btn-logout" style="display:none;">🚪 Logout</button>
+                            <button id="printBtn" class="btn-print btn">🖨️ Print / ထုတ်ယူရန်</button>
+                        </div>
+                    </div>
+
+                    <!-- ရလဒ်ဇယား ပြသမည့်နေရာ -->
+                    <div id="resultTableContainer" class="mt-3">
+                        <div class="alert alert-info">ကျေးဇူးပြု၍ အတန်းတစ်ခုခုကို ရွေးပါ။</div>
+                    </div>
+                </div>
+            </div>
+            <footer class="no-print">
+                <hr>
+                📞 09952018168 &nbsp;|&nbsp; ✉️ madrasahtaleemulquran98@gmail.com<br>
+                🕌 အမှတ်(6)၊ 98လမ်း၊ မင်္ဂလာတောင်ညွန့်မြို့နယ်၊ ရန်ကုန်တိုင်း။<br>
+                © 2025 Madrasah Taleemul Quran
+            </footer>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Admin Login</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="email" id="loginEmail" class="form-control mb-2" placeholder="Email" value="madrasahtaleemulquran98@gmail.com">
+                    <input type="password" id="loginPassword" class="form-control mb-2" placeholder="Password">
+                    <div id="loginError" class="text-danger small"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="confirmLoginBtn" class="btn btn-success">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ---------- အတန်းအလိုက် ဘာသာရပ်များ (မူလဒေတာ) ----------
+        const subjectsByClass = {
+            1: ["ယစ္စရ်နလ် ကုရ်အာန်", "စူရဟ်အလွတ်ကျက်ခြင်း", "မစ္စနူးန် ဒိုအာ", "ဟဒီးဆ်တော်", "ကုရ်အာနီ ဒိုအာ", "ဂုဏ်တော်များ", "ကလိမဟ်", "အလ်မုဖရ်ရဒါးသ် (အာရဗီ)"],
+            2: ["ယစ္စရ်နလ် ကုရ်အာန်", "ဂုဏ်တော်", "စူရဟ်အလွတ်ကျက်မှတ်ခြင်း", "ကလိမဟ်", "ဟဒီးဆ်တော်", "အူရ်ဒူ ကာအေဒဟ်", "မစ္စနှုးန် ဒိုအာ", "အလ်မွဖ်ဖရ်ရဒါးသ်", "ကုရ်အာနီ ဒိုအာ"],
+            3: ["ယစ္စရ်နလ် ကုရ်အာန်", "စူရဟ်အလွတ်ကျက်မှတ်ခြင်း", "ဟဒီးဆ်တော်", "မစ္စနှုးန် ဒိုအာ", "ကုရ်အာနီ ဒိုအာ", "ဂုဏ်တော်", "ကလိမဟ်", "အူရ်ဒူ ကာအေဒဟ်", "အလ်မွဖ်ဖရ်ရဒါးသ်"],
+            4: ["ကုရ်အာန်", "စူရဟ်အလွတ်ကျက်မှတ်ခြင်း", "သခ်ျဝီးဒ်", "ဟဒီးဆ်တော်", "မစ္စနူးန်ဒိုအာ", "ကုရ်အာနီဒိုအာ", "ဂုဏ်တော်", "ကလိမဟ်", "အုရ်ဒူပဟ်လီ", "အလ်မုဖရ်ရဒါးသ်"],
+            5: ["ကုရ်အာန်", "စူရဟ်အလွတ်ကျက်မှတ်ခြင်း", "သဂ်ျဝီးဒ်", "အစ္စလာမ့်အခြေပြ(အတွဲ၁)", "သအ်လီမုလ်အစ္စလာမ်(အတွဲ၁)", "အစ္စလာမီးအာဒါးဘ်(အတွဲ၁)", "ကျွန်ုပ်တို့၏မြတ်နဗီ", "အုရ်ဒူ ပဟ်လီ", "သအ်လီမုလ်အစ္စလာမ်(အတွဲ၁)အုရ်ဒူ", "အလ်မုဖရ်ရဒါးသ်"],
+            6: ["ကုရ်အာန်", "စူရဟ်အလွတ်ကျက်မှတ်ခြင်း", "သခ်ျဝီးဒ်", "အစ္စလာမ့်အခြေပြ အတွဲ 2", "သအ်လီမုလ်အစ္စလာမ် အတွဲ 2", "အစ္စလာမီအားဒါဘ် အတွဲ 2", "ကျွန်ုပ်တို့မြတ်ရစူလ်", "အခြေခံသမိုင်း", "မစာအေလေနမားဇ်", "အုရ်ဒူ ဒူစရီး", "သအ်လီမုလ်အစ္စလာမ် အုရ်ဒူ", "အလ်မုဖရ်ရဒါးသ်"],
+            7: ["ကုရ်အာန်", "စူရဟ်အလွတ်ကျက်မှတ်ခြင်း", "သဂ်ျဝီးဒ်", "အခြေပြ အတွဲ3", "သအ်လီမုလ်အစ္စလာမ် အတွဲ3", "အစ္စလာမီ့အကာအီးဒ်", "တမန်တော်မြတ်၏အတ္ထုပ္ပတ္တိ", "နဗီတမန်တော်များအတ္ထုပ္ပတ္တိ", "ဟမာရေးအီမာန်", "ဟမာရေး နဗီ", "သအ်လီမုလ်အစ္စလာမ် အတွဲ3 အုရ်ဒူ", "အုရ်ဒူ သီစရီး"],
+            8: ["ကုရ်အာန်", "စူရဟ်အလွတ်ကျက်မှတ်ခြင်း", "သဂ်ျဝီးဒ်", "အစ္စလာမ့်အခြေပြ အတွဲ4", "သအ်လီမုလ်အစ္စလာမ် အတွဲ4", "တမန်တော်မြတ်အတ္ထုပ္ပတ္တိ", "နဗီတမန်တော်များအကြောင်း", "ကုရ်အာန်ရှင်းလင်းချက်", "ဟာမာရေးရစူလ်", "သအ်လီမုလ်အစ္စလာမ် 4 အုရ်ဒူ", "အစ္စလာမီ့အကာအီးဒ် အုရ်ဒူ", "မစာအေလေနမားဇ် အုရ်ဒူ", "ဒူရူစွလ်လုဂါးသ်", "အုရ်ဒူ ကြောဝ်ထီး"]
+        };
+
+        const ROWS = 15; // ကျောင်းသား 15 ဦး
+        let currentClass = "";
+        let isAdmin = false;   // login state
+        let currentData = {};   // structure: { classId: { studentData: [{ studentName, fatherName, marks:[] }] } }
+
+        // Load data from localStorage
+        function loadAllData() {
+            const saved = localStorage.getItem("examResultsData");
+            if (saved) {
+                currentData = JSON.parse(saved);
+            } else {
+                currentData = {};
+                // Initialize empty structure for each class
+                for (let c = 1; c <= 8; c++) {
+                    const subjects = subjectsByClass[c];
+                    const studentData = [];
+                    for (let i = 0; i < ROWS; i++) {
+                        studentData.push({
+                            studentName: "",
+                            fatherName: "",
+                            marks: new Array(subjects.length).fill("")
+                        });
+                    }
+                    currentData[c] = { studentData };
+                }
+                saveAllData();
+            }
+        }
+
+        function saveAllData() {
+            localStorage.setItem("examResultsData", JSON.stringify(currentData));
+        }
+
+        // Save current class data
+        function saveCurrentClassData(classId, studentData) {
+            if (!currentData[classId]) currentData[classId] = { studentData: [] };
+            currentData[classId].studentData = studentData;
+            saveAllData();
+        }
+
+        // Helper: get grade based on percentage
+        function getGrade(percentage) {
+            if (percentage >= 80) return { grade: "A", class: "grade-A" };
+            if (percentage >= 60) return { grade: "B", class: "grade-B" };
+            if (percentage >= 40) return { grade: "C", class: "grade-C" };
+            return { grade: "D", class: "grade-D" };
+        }
+
+        // Render table for selected class
+        function renderTable(classId) {
+            const container = document.getElementById("resultTableContainer");
+            if (!classId || !subjectsByClass[classId]) {
+                container.innerHTML = '<div class="alert alert-info">ကျေးဇူးပြု၍ အတန်းတစ်ခုခုကို ရွေးပါ။</div>';
+                return;
+            }
+
+            const subjects = subjectsByClass[classId];
+            const studentData = currentData[classId]?.studentData || [];
+            // Ensure 15 rows
+            while (studentData.length < ROWS) {
+                studentData.push({ studentName: "", fatherName: "", marks: new Array(subjects.length).fill("") });
+            }
+            if (studentData.length > ROWS) studentData.length = ROWS;
+            // Ensure marks array length matches subjects
+            for (let i = 0; i < studentData.length; i++) {
+                if (!studentData[i].marks) studentData[i].marks = [];
+                if (studentData[i].marks.length < subjects.length) {
+                    for (let j = studentData[i].marks.length; j < subjects.length; j++) studentData[i].marks.push("");
+                } else if (studentData[i].marks.length > subjects.length) {
+                    studentData[i].marks = studentData[i].marks.slice(0, subjects.length);
+                }
+            }
+
+            // Build table HTML
+            let html = `<div class="table-responsive"><table class="table table-bordered table-striped" id="resultTable">
+                        <thead class="table-success">
+                            <tr>
+                                <th>စဉ်</th>
+                                <th>ကျောင်းသားအမည်</th>
+                                <th>ဖခင်အမည်</th>`;
+            subjects.forEach(sub => {
+                html += `<th>${sub}</th>`;
+            });
+            html += `<th>စုစုပေါင်းရမှတ်</th><th>အဆင့်</th></tr></thead><tbody>`;
+
+            for (let i = 0; i < ROWS; i++) {
+                const student = studentData[i];
+                const marks = student.marks;
+                let total = 0;
+                let validCount = 0;
+                for (let m of marks) {
+                    let val = parseFloat(m);
+                    if (!isNaN(val) && val >= 0 && val <= 100) {
+                        total += val;
+                        validCount++;
+                    }
+                }
+                const percentage = validCount > 0 ? total / validCount : 0;
+                const gradeInfo = getGrade(percentage);
+                const grade = gradeInfo.grade;
+                const gradeClass = gradeInfo.class;
+
+                html += `<tr>
+                            <td>${i+1}</td>
+                            <td><input type="text" class="form-control student-name" value="${escapeHtml(student.studentName)}" ${isAdmin ? '' : 'disabled'}></td>
+                            <td><input type="text" class="form-control father-name" value="${escapeHtml(student.fatherName)}" ${isAdmin ? '' : 'disabled'}></td>`;
+                for (let s = 0; s < subjects.length; s++) {
+                    let markValue = marks[s] !== undefined ? marks[s] : "";
+                    html += `<td><input type="number" class="form-control mark-input" value="${markValue}" min="0" max="100" step="1" ${isAdmin ? '' : 'disabled'}></td>`;
+                }
+                html += `<td class="total-col">${total.toFixed(2)}</td>
+                         <td class="grade-col ${gradeClass}">${grade}</td>
+                         </tr>`;
+            }
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
+
+            // Attach event listeners if admin
+            if (isAdmin) {
+                attachInputEvents(classId);
+            }
+        }
+
+        function attachInputEvents(classId) {
+            const rows = document.querySelectorAll("#resultTable tbody tr");
+            const subjects = subjectsByClass[classId];
+            const studentData = currentData[classId]?.studentData || [];
+
+            rows.forEach((row, idx) => {
+                const nameInput = row.querySelector(".student-name");
+                const fatherInput = row.querySelector(".father-name");
+                const markInputs = row.querySelectorAll(".mark-input");
+
+                if (nameInput) {
+                    nameInput.addEventListener("change", function() {
+                        studentData[idx].studentName = this.value;
+                        saveCurrentClassData(classId, studentData);
+                    });
+                }
+                if (fatherInput) {
+                    fatherInput.addEventListener("change", function() {
+                        studentData[idx].fatherName = this.value;
+                        saveCurrentClassData(classId, studentData);
+                    });
+                }
+                markInputs.forEach((input, subjIdx) => {
+                    input.addEventListener("change", function() {
+                        let val = this.value.trim() === "" ? "" : parseFloat(this.value);
+                        if (val === "" || isNaN(val)) val = "";
+                        else if (val < 0) val = 0;
+                        else if (val > 100) val = 100;
+                        studentData[idx].marks[subjIdx] = val;
+                        saveCurrentClassData(classId, studentData);
+                        // Re-render to update total and grade
+                        renderTable(classId);
+                    });
+                });
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return "";
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Login logic
+        function checkLoginStatus() {
+            const logged = sessionStorage.getItem("adminLoggedIn");
+            isAdmin = (logged === "true");
+            const loginStatusSpan = document.getElementById("loginStatus");
+            const loginBtn = document.getElementById("loginBtn");
+            const logoutBtn = document.getElementById("logoutBtn");
+            if (isAdmin) {
+                loginStatusSpan.textContent = "✅ Admin အကောင့်ဝင်ထားပြီး";
+                loginStatusSpan.className = "badge bg-success me-2";
+                loginBtn.style.display = "none";
+                logoutBtn.style.display = "inline-block";
+            } else {
+                loginStatusSpan.textContent = "🔒 Admin မဝင်ရသေး";
+                loginStatusSpan.className = "badge bg-secondary me-2";
+                loginBtn.style.display = "inline-block";
+                logoutBtn.style.display = "none";
+            }
+            // Re-render current class to enable/disable inputs
+            if (currentClass) {
+                renderTable(currentClass);
+            }
+        }
+
+        function login(email, password) {
+            if (email === "madrasahtaleemulquran98@gmail.com" && password === "admin123") {
+                sessionStorage.setItem("adminLoggedIn", "true");
+                isAdmin = true;
+                return true;
+            }
+            return false;
+        }
+
+        function logout() {
+            sessionStorage.removeItem("adminLoggedIn");
+            isAdmin = false;
+            checkLoginStatus();
+        }
+
+        // Event listeners
+        document.addEventListener("DOMContentLoaded", function() {
+            loadAllData();
+            checkLoginStatus();
+
+            const classSelect = document.getElementById("classSelect");
+            const printBtn = document.getElementById("printBtn");
+            const loginBtn = document.getElementById("loginBtn");
+            const logoutBtn = document.getElementById("logoutBtn");
+            const confirmLogin = document.getElementById("confirmLoginBtn");
+            const loginModalEl = document.getElementById("loginModal");
+            const loginModal = new bootstrap.Modal(loginModalEl);
+
+            classSelect.addEventListener("change", function() {
+                currentClass = this.value;
+                if (currentClass) {
+                    renderTable(currentClass);
+                } else {
+                    document.getElementById("resultTableContainer").innerHTML = '<div class="alert alert-info">ကျေးဇူးပြု၍ အတန်းတစ်ခုခုကို ရွေးပါ။</div>';
+                }
+            });
+
+            printBtn.addEventListener("click", function() {
+                window.print();
+            });
+
+            loginBtn.addEventListener("click", function() {
+                loginModal.show();
+            });
+
+            confirmLogin.addEventListener("click", function() {
+                const email = document.getElementById("loginEmail").value;
+                const pwd = document.getElementById("loginPassword").value;
+                const errorSpan = document.getElementById("loginError");
+                if (login(email, pwd)) {
+                    loginModal.hide();
+                    checkLoginStatus();
+                    if (currentClass) renderTable(currentClass);
+                    errorSpan.innerText = "";
+                } else {
+                    errorSpan.innerText = "Email သို့မဟုတ် လျှို့ဝှက်နံပါတ် မှားယွင်းနေပါသည်။";
+                }
+            });
+
+            logoutBtn.addEventListener("click", function() {
+                logout();
+                if (currentClass) renderTable(currentClass);
+            });
+        });
+    </script>
+</body>
+</html>
