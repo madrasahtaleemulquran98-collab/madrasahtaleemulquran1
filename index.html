@@ -211,3 +211,137 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>ကျောင်းအပ်ရန် - Madrasah Taleemul Quran</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        body { background: #f0f4f8; font-family: 'Segoe UI', system-ui; padding-bottom: 2rem; }
+        .form-card { max-width: 700px; margin: 2rem auto; }
+        .card-header { background: #2c5f2d; color: white; font-size: 1.5rem; }
+        .btn-submit { background: #2c5f2d; border: none; }
+        .btn-submit:hover { background: #1e4620; }
+        footer { text-align: center; margin-top: 2rem; color: #6c757d; }
+        .contact-line { font-size: 0.9rem; margin-top: 1rem; text-align: center; }
+        .loading { pointer-events: none; opacity: 0.7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-card">
+            <div class="card shadow">
+                <div class="card-header text-center">
+                    📝 ကျောင်းအပ်ရန် လျှောက်လွှာ
+                </div>
+                <div class="card-body">
+                    <form id="enrollForm">
+                        <div class="mb-3">
+                            <label class="form-label">ကျောင်းသား/ကျောင်းသူ အမည် *</label>
+                            <input type="text" class="form-control" id="studentName" name="studentName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ဖခင်/မိခင် အမည် *</label>
+                            <input type="text" class="form-control" id="parentName" name="parentName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">အတန်း *</label>
+                            <select class="form-select" id="className" name="className" required>
+                                <option value="">အတန်းရွေးပါ</option>
+                                <option value="မူကြိုတန်း">မူကြိုတန်း</option>
+                                <option value="သူငယ်တန်းလေး">သူငယ်တန်းလေး</option>
+                                <option value="သူငယ်တန်းကြီး">သူငယ်တန်းကြီး</option>
+                                <option value="ပထမတန်းလေး">ပထမတန်းလေး</option>
+                                <option value="ပထမတန်းကြီး">ပထမတန်းကြီး</option>
+                                <option value="ဒုတိယတန်း">ဒုတိယတန်း</option>
+                                <option value="တတိယတန်း">တတိယတန်း</option>
+                                <option value="စတုတ္ထတန်း">စတုတ္ထတန်း</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ဖုန်းနံပါတ်</label>
+                            <input type="tel" class="form-control" id="phone" name="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">လိပ်စာ</label>
+                            <textarea class="form-control" id="address" name="address" rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-submit btn-primary w-100" id="submitBtn">အပ်နှံမည်</button>
+                    </form>
+                    <div id="formMessage" class="mt-3"></div>
+                </div>
+            </div>
+            <div class="contact-line">
+                📞 09952018168 &nbsp;|&nbsp; ✉️ madrasahtaleemulquran98@gmail.com<br>
+                🕌 အမှတ်(6)၊ 98လမ်း၊ မင်္ဂလာတောင်ညွန့်မြို့နယ်၊ ရန်ကုန်တိုင်း။
+            </div>
+            <footer>© 2025 Madrasah Taleemul Quran</footer>
+        </div>
+    </div>
+
+    <script>
+        // EmailJS ကို သင်၏ public key ဖြင့် initialize လုပ်ပါ
+        (function() {
+            emailjs.init({
+                publicKey: "xzGPcuOfvRCnsDKsp",
+            });
+        })();
+
+        // Form element များကို ရယူပါ
+        const form = document.getElementById('enrollForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('formMessage');
+
+        // Form submit event
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();  // Page reload မဖြစ်အောင် တားပါ
+
+            // Required fields စစ်ဆေးပါ
+            const studentName = document.getElementById('studentName').value.trim();
+            const parentName = document.getElementById('parentName').value.trim();
+            const className = document.getElementById('className').value;
+            if (!studentName || !parentName || !className) {
+                messageDiv.innerHTML = '<div class="alert alert-warning">ကျေးဇူးပြု၍ အမည်နှင့် အတန်း ဖြည့်ပါ။</div>';
+                return;
+            }
+
+            // Submit button ကို disable လုပ်ပြီး loading text ပြပါ
+            submitBtn.disabled = true;
+            submitBtn.innerText = '⏳ ပို့နေသည်...';
+            messageDiv.innerHTML = '';  // အရင် message ရှင်းပါ
+
+            // EmailJS သို့ ပို့ရန် template parameters (Send the form data)
+            const templateParams = {
+                student_name: studentName,
+                parent_name: parentName,
+                class_name: className,
+                phone: document.getElementById('phone').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                // အကယ်၍ သင့် template က to_email လိုအပ်ရင် အောက်ပါအတိုင်း ထည့်နိုင်ပါတယ်
+                // to_email: 'madrasahtaleemulquran98@gmail.com'
+            };
+
+            // EmailJS send လုပ်ပါ
+            emailjs.send('service_32ki7nu', 'template_dye00bf', templateParams)
+                .then(function(response) {
+                    console.log('Success!', response.status, response.text);
+                    messageDiv.innerHTML = '<div class="alert alert-success">✅ အောင်မြင်စွာ ကျောင်းအပ်ပြီးပါပြီ။ ကျေးဇူးတင်ပါတယ်။</div>';
+                    form.reset();   // Form ကို ရှင်းပါ
+                }, function(error) {
+                    console.error('Failed...', error);
+                    messageDiv.innerHTML = '<div class="alert alert-danger">❌ အမှားအယွင်းရှိသည်။ နောက်မှထပ်ကြိုးစားပါ။ <br>' + (error.text || '') + '</div>';
+                })
+                .finally(() => {
+                    // Submit button ကို ပြန်အသက်သွင်းပါ
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'အပ်နှံမည်';
+                });
+        });
+    </script>
+</body>
+</html>
